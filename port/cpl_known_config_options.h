@@ -583,6 +583,7 @@ constexpr static const char* const apszKnownConfigOptions[] =
    "JPEG_TABLESMODE_OVERVIEW", // from gt_overview.cpp
    "JPEG_WRITE_MASK_BIT_ORDER", // from jpgdataset.cpp
    "JPEG_WRITE_RGB", // from jpgdataset.cpp
+   "JPEG_YCBCR_SUBSAMPLING_OVERVIEW", // from gt_overview.cpp
    "JPEGMEM", // from gt_jpeg_copy.cpp, jpgdataset.cpp
    "JXL_ALPHA_DISTANCE_OVERVIEW", // from gt_overview.cpp
    "JXL_DISTANCE_OVERVIEW", // from gt_overview.cpp

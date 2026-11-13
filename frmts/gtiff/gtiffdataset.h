@@ -59,6 +59,8 @@ typedef struct
     bool bReady;
     uint16_t *pExtraSamples;
     uint16_t nExtraSampleCount;
+    uint16_t nYCbCrSubsamplingHoriz;
+    uint16_t nYCbCrSubsamplingVert;
 } GTiffCompressionJob;
 
 typedef enum

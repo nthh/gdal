@@ -835,6 +835,17 @@ This driver supports the following creation options:
       Values above 95 are not meaningfully better quality but can be
       substantially larger.
 
+-  .. co:: JPEG_YCBCR_SUBSAMPLING
+      :choices: 4:2:0, 4:2:2, 4:4:4
+      :default: 4:2:0
+
+      Chroma subsampling used with COMPRESS=JPEG and PHOTOMETRIC=YCBCR.
+      4:2:0 stores colour at half the resolution of brightness in both
+      directions, 4:2:2 at half the resolution horizontally only, and 4:4:4
+      at full resolution. 4:4:4 keeps thin coloured features at the cost of
+      a larger file. Overviews are controlled separately by the
+      :config:`JPEG_YCBCR_SUBSAMPLING_OVERVIEW` configuration option.
+
 -  .. co:: JPEGTABLESMODE
       :choices: 0, 1, 2, 3
       :default: 1
@@ -1268,6 +1279,13 @@ the default behavior of the GTiff driver.
       :choices: 1, 2, 3
 
       Set the predictor to use for overviews with LZW, DEFLATE and ZSTD compression.
+
+-  .. config:: JPEG_YCBCR_SUBSAMPLING_OVERVIEW
+      :choices: 4:2:0, 4:2:2, 4:4:4
+      :default: 4:2:0
+
+      Chroma subsampling of JPEG compressed overviews in the YCbCr
+      colorspace, either internal or external.
 
 -  .. config:: JPEG_QUALITY_OVERVIEW
       :choices: Integer between 0 and 100

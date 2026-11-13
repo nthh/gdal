@@ -1261,7 +1261,14 @@ void GDALRegister_GTiff()
             "quality 1-100' min='1' max='100' default='75'/>"
             "   <Option name='JPEGTABLESMODE' type='int' description='Content "
             "of JPEGTABLES tag. 0=no JPEGTABLES tag, 1=Quantization tables "
-            "only, 2=Huffman tables only, 3=Both' default='1'/>";
+            "only, 2=Huffman tables only, 3=Both' default='1'/>"
+            "   <Option name='JPEG_YCBCR_SUBSAMPLING' type='string-select' "
+            "description='Chroma subsampling for PHOTOMETRIC=YCBCR' "
+            "default='4:2:0'>"
+            "     <Value>4:2:0</Value>"
+            "     <Value>4:2:2</Value>"
+            "     <Value>4:4:4</Value>"
+            "   </Option>";
 #ifdef JPEG_DIRECT_COPY
         osOptions +=
             ""

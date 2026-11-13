@@ -1226,7 +1226,12 @@ GDALCOGCreator::Create(const char *pszFilename, GDALDataset *const poSrcDS,
     {
         aosOptions.SetNameValue("JPEG_QUALITY", pszQuality);
         if (nBands == 3 && EQUAL(pszInterleave, "PIXEL"))
+        {
             aosOptions.SetNameValue("PHOTOMETRIC", "YCBCR");
+            aosOptions.SetNameValue(
+                "JPEG_YCBCR_SUBSAMPLING",
+                CSLFetchNameValue(papszOptions, "JPEG_YCBCR_SUBSAMPLING"));
+        }
     }
     else if (EQUAL(osCompress, "WEBP"))
     {
@@ -1346,6 +1351,11 @@ GDALCOGCreator::Create(const char *pszFilename, GDALDataset *const poSrcDS,
                 "WEBP_LEVEL_OVERVIEW", pszOverviewQuality, true));
         }
     }
+
+    // Overviews use the same chroma subsampling as full resolution
+    CPLConfigOptionSetter ovrSubsamplingSetter(
+        "JPEG_YCBCR_SUBSAMPLING_OVERVIEW",
+        CSLFetchNameValue(papszOptions, "JPEG_YCBCR_SUBSAMPLING"), true);
 
     std::unique_ptr<CPLConfigOptionSetter> poPhotometricSetter;
     if (nBands == 3 && EQUAL(pszOverviewCompress, "JPEG") &&
@@ -1653,6 +1663,17 @@ void GDALCOGDriver::InitializeCreationOptionList()
                      "type='string-select' default='FALSE'>";
         osOptions += osPredictorOptions;
         osOptions += "   </Option>";
+    }
+    if (bHasJPEG)
+    {
+        osOptions += "   <Option name='JPEG_YCBCR_SUBSAMPLING' "
+                     "type='string-select' description='Chroma subsampling "
+                     "of JPEG compressed RGB images, for full resolution and "
+                     "overviews' default='4:2:0'>"
+                     "     <Value>4:2:0</Value>"
+                     "     <Value>4:2:2</Value>"
+                     "     <Value>4:4:4</Value>"
+                     "   </Option>";
     }
     if (bHasJPEG || bHasWebP)
     {

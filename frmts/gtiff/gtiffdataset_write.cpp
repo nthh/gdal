@@ -995,6 +995,13 @@ void GTiffDataset::ThreadCompressionFunc(void *pData)
         TIFFSetField(hTIFFTmp, TIFFTAG_EXTRASAMPLES, psJob->nExtraSampleCount,
                      psJob->pExtraSamples);
     }
+    if (poDS->m_nPhotometric == PHOTOMETRIC_YCBCR)
+    {
+        // The tile must be encoded with the subsampling the file declares
+        TIFFSetField(hTIFFTmp, TIFFTAG_YCBCRSUBSAMPLING,
+                     psJob->nYCbCrSubsamplingHoriz,
+                     psJob->nYCbCrSubsamplingVert);
+    }
 
     poDS->RestoreVolatileParameters(hTIFFTmp);
 
@@ -1355,6 +1362,15 @@ bool GTiffDataset::SubmitCompressionJob(int nStripOrTile, GByte *pabyData,
         sJob.nExtraSampleCount = 0;
         TIFFGetField(m_hTIFF, TIFFTAG_EXTRASAMPLES, &sJob.nExtraSampleCount,
                      &sJob.pExtraSamples);
+
+        sJob.nYCbCrSubsamplingHoriz = 2;
+        sJob.nYCbCrSubsamplingVert = 2;
+        if (m_nPhotometric == PHOTOMETRIC_YCBCR)
+        {
+            TIFFGetFieldDefaulted(m_hTIFF, TIFFTAG_YCBCRSUBSAMPLING,
+                                  &sJob.nYCbCrSubsamplingHoriz,
+                                  &sJob.nYCbCrSubsamplingVert);
+        }
         return true;
     };
 
@@ -6170,7 +6186,20 @@ TIFF *GTiffDataset::CreateLL(const char *pszFilename, int nXSize, int nYSize,
 
             // Explicitly register the subsampling so that JPEGFixupTags
             // is a no-op (helps for cloud optimized geotiffs)
-            TIFFSetField(l_hTIFF, TIFFTAG_YCBCRSUBSAMPLING, 2, 2);
+            uint16_t nSubsamplingHoriz = 2;
+            uint16_t nSubsamplingVert = 2;
+            if (!GTIFFParseYCbCrSubsampling(
+                    CSLFetchNameValue(papszParamList,
+                                      "JPEG_YCBCR_SUBSAMPLING"),
+                    nSubsamplingHoriz, nSubsamplingVert))
+            {
+                XTIFFClose(l_hTIFF);
+                l_fpL->CancelCreation();
+                CPL_IGNORE_RET_VAL(VSIFCloseL(l_fpL));
+                return nullptr;
+            }
+            TIFFSetField(l_hTIFF, TIFFTAG_YCBCRSUBSAMPLING, nSubsamplingHoriz,
+                         nSubsamplingVert);
         }
         else if (EQUAL(pszValue, "CIELAB"))
         {

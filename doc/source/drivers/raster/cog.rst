@@ -424,6 +424,17 @@ General creation options
      By default the overviews will be created with the same quality as the COG, unless
      the compression type is different then the default is 75.
 
+- .. co:: JPEG_YCBCR_SUBSAMPLING
+     :choices: 4:2:0, 4:2:2, 4:4:4
+     :default: 4:2:0
+
+     Chroma subsampling of JPEG compressed 3-band images, which are written
+     in the YCbCr colorspace. It applies to full resolution and to overviews.
+     4:2:0 stores colour at half the resolution of brightness in both
+     directions. 4:4:4 stores it at full resolution, which keeps thin
+     coloured features (road markings, for example) at the cost of a file
+     about 20 to 25% larger at the same quality.
+
 - .. co:: OVERVIEW_PREDICTOR
      :choices: YES, NO, STANDARD, FLOATING_POINT
 

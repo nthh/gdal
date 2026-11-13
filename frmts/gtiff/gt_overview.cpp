@@ -41,6 +41,35 @@
 constexpr int knMaxOverviews = 128;
 
 /************************************************************************/
+/*                     GTIFFParseYCbCrSubsampling()                     */
+/************************************************************************/
+
+bool GTIFFParseYCbCrSubsampling(const char *pszValue, uint16_t &nHoriz,
+                                uint16_t &nVert)
+{
+    nHoriz = 2;
+    nVert = 2;
+    if (pszValue == nullptr || EQUAL(pszValue, "4:2:0"))
+        return true;
+    if (EQUAL(pszValue, "4:2:2"))
+    {
+        nVert = 1;
+        return true;
+    }
+    if (EQUAL(pszValue, "4:4:4"))
+    {
+        nHoriz = 1;
+        nVert = 1;
+        return true;
+    }
+    CPLError(CE_Failure, CPLE_IllegalArg,
+             "Invalid value for JPEG_YCBCR_SUBSAMPLING: %s. "
+             "Expected 4:2:0, 4:2:2 or 4:4:4",
+             pszValue);
+    return false;
+}
+
+/************************************************************************/
 /*                         GTIFFWriteDirectory()                        */
 /*                                                                      */
 /*      Create a new directory, without any image data for an overview  */
@@ -143,7 +172,17 @@ toff_t GTIFFWriteDirectory(TIFF *hTIFF, int nSubfileType, int nXSize,
         {
             // Explicitly register the subsampling so that JPEGFixupTags
             // is a no-op (helps for cloud optimized geotiffs)
-            TIFFSetField(hTIFF, TIFFTAG_YCBCRSUBSAMPLING, 2, 2);
+            uint16_t nSubsamplingHoriz = 2;
+            uint16_t nSubsamplingVert = 2;
+            if (!GTIFFParseYCbCrSubsampling(
+                    CPLGetConfigOption("JPEG_YCBCR_SUBSAMPLING_OVERVIEW",
+                                       nullptr),
+                    nSubsamplingHoriz, nSubsamplingVert))
+            {
+                return 0;
+            }
+            TIFFSetField(hTIFF, TIFFTAG_YCBCRSUBSAMPLING, nSubsamplingHoriz,
+                         nSubsamplingVert);
         }
     }
 

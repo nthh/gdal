@@ -35,6 +35,12 @@ toff_t GTIFFWriteDirectory(TIFF *hTIFF, int nSubfileType, int nXSize,
                            const uint32_t *panLercAddCompressionAndVersion,
                            bool bDeferStrileArrayWriting);
 
+/** Parse a JPEG_YCBCR_SUBSAMPLING value (4:2:0, 4:2:2 or 4:4:4) into the
+ * horizontal and vertical factors of the TIFF YCbCrSubSampling tag.
+ * A null value gives the default, 4:2:0. Returns false on an unknown value. */
+bool GTIFFParseYCbCrSubsampling(const char *pszValue, uint16_t &nHoriz,
+                                uint16_t &nVert);
+
 void GTIFFBuildOverviewMetadata(const char *pszResampling,
                                 GDALDataset *poBaseDS, bool bIsForMaskBand,
                                 CPLString &osMetadata);
